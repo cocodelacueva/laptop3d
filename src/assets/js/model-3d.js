@@ -1,7 +1,7 @@
 import { WEBGL } from './webgl';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight } from 'three';
+import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight, Clock, AnimationMixer, LoopOnce } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 //variables globales
@@ -17,6 +17,8 @@ const colors = {
 const URLMODELO = 'assets/models/pc-model-3d.glb';
 let modelo1;
 let light1, light2, light3, light4;
+let mixer;
+const clock = new Clock();
 
 export default function init3d(wrapper) {
     const contenedor = wrapper.querySelector('#modelo3d');
@@ -27,13 +29,10 @@ export default function init3d(wrapper) {
     }
 
     if ( WEBGL.isWebGLAvailable() ) {
-
         // Initiate function or other initializations here
         console.log('init 3d');
         start(contenedor);
-    
     } else {
-    
         const warning = WEBGL.getWebGLErrorMessage();
         contenedor.appendChild( warning );
         return;
@@ -57,6 +56,7 @@ function start(contenedor) {
 
     //camera
     const camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+    camera.position.set(0, 2, 7); //(x,y,z), NO SON PIXELES, son unidades
     scene.add( camera );
 
     //iluminacion
@@ -73,9 +73,9 @@ function start(contenedor) {
 
         let pcModelada = modelo1.scene;
         
-        let scale = .5;
         // Escala
-		pcModelada.scale.set(scale, scale, scale);
+        let scale = 0.1;
+        pcModelada.scale.set(scale, scale, scale);
 
 		// Sombras
 		pcModelada.traverse((object) => {
@@ -86,24 +86,51 @@ function start(contenedor) {
         pcModelada.receiveShadow = true;
         
         //posicion y rotacion
-        pcModelada.position.set(0, -3, 0);
+        pcModelada.position.set(0, 0, 0);
         pcModelada.rotation.set(0, 0, 0);
 
         // Añaadir modelos a la escena
         scene.add( pcModelada );
 
+        const animationPc = modelo1.animations; // Selecciona la animacion del modelo
+
+        // El mixer se encarga de poder reproducir las animaciones
+        mixer = new AnimationMixer(pcModelada);
+
+        // Seleccionar la animacion
+        const onPc = mixer.clipAction(animationPc[0]);
+        let actions = [onPc];
+        activateAnimation(onPc);
+        
         animate()
     });
 
     
 
     function animate() {
-        requestAnimationFrame( animate );
+        
+        const delta = clock.getDelta();
+
+        requestAnimationFrame(animate);
+
+        mixer.update(delta); // Esto es necesario para lograr que la animacion se reproduzca
+
+        render();
     
-        renderer.render( scene, camera );
     }
 
-    
+    /// Animations ///
+    function activateAnimation(action) {
+        console.log("Nombre de la animacion:", action._clip.name);
+        if (action.paused === true) action.paused = false; // Si esta en pausa, lo reanuda
+        //if (action._clip.name === "animation_0") action.setLoop(LoopOnce); // Lo reproduce una sola vez
+        action.play();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+    }
+ 
 
 }
 
@@ -111,7 +138,6 @@ function start(contenedor) {
 
 
 //helpers
-
 function loadModel(url) {
     const loader = new GLTFLoader();
     const manager = new LoadingManager();
