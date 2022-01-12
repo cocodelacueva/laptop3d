@@ -56,8 +56,9 @@ function start(contenedor) {
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     //camera
-    const camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 2000 );
-    
+    const camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+    scene.add( camera );
+
     //iluminacion
     const ilumination = createIlumination(scene, colors);
 
@@ -72,7 +73,7 @@ function start(contenedor) {
 
         let pcModelada = modelo1.scene;
         
-        let scale = 0.5;
+        let scale = .5;
         // Escala
 		pcModelada.scale.set(scale, scale, scale);
 
@@ -132,11 +133,6 @@ function createIlumination(scene, colors) {
 
 	const dirLight = new DirectionalLight(blue, 0.05);
 	dirLight.position.set(0, 50, 5).normalize();
-	// dirLight.color.setHSL(0.1, 0.7, 0.5);
-	// scene.add(dirLight);
-
-	// const dirHelper = new DirectionalLightHelper(dirLight);
-	// scene.add(dirHelper);
 
 	const sphere = new SphereGeometry(0.5, 16, 8);
 
