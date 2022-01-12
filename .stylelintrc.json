@@ -1,0 +1,18 @@
+{
+    "plugins": [
+      "stylelint-scss"
+    ],
+    "extends": "stylelint-config-standard",
+    "defaultSeverity": "warning",
+    "rules": {
+      "indentation": [4, {"severity":"error"}],
+      "at-rule-no-unknown": null,
+      "no-extra-semicolons": true,
+      "no-empty-source": true,
+      "length-zero-no-unit": true,
+      "scss/at-rule-no-unknown": true,
+      "comment-no-empty": true,
+      "declaration-no-important": true,
+      "scss/selector-no-redundant-nesting-selector": true
+    }
+  }
