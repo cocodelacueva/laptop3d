@@ -14,7 +14,7 @@ const colors = {
     green: 0x77dd77,
 };
 
-const URLMODELO = 'assets/models/pc-model-3d.glb';
+const URLMODELO = 'assets/models/animacion2.glb';
 let modelo1;
 let light1, light2, light3, light4;
 let mixer;
