@@ -69,8 +69,7 @@ function start(contenedor) {
 
     //si todos los modelos fueron cargados:
 	Promise.all([p1]).then(() => {
-        console.log(modelo1)
-
+        
         let pcModelada = modelo1.scene;
         
         // Escala
@@ -122,9 +121,9 @@ function start(contenedor) {
     /// Animations ///
     function activateAnimation(action) {
         console.log("Nombre de la animacion:", action._clip.name);
-        if (action.paused === true) action.paused = false; // Si esta en pausa, lo reanuda
+        //if (action.paused === true) action.paused = false; // Si esta en pausa, lo reanuda
         //if (action._clip.name === "animation_0") action.setLoop(LoopOnce); // Lo reproduce una sola vez
-        action.play();
+        //action.play();
     }
 
     function render() {
