@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight, Clock, AnimationMixer, LoopOnce } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 //variables globales
 const colors = {
@@ -18,6 +19,7 @@ const URLMODELO = 'assets/models/animacion2.glb';
 let modelo1;
 let light1, light2, light3, light4;
 let mixer;
+let animatedOn = false;
 const clock = new Clock();
 
 export default function init3d(wrapper) {
@@ -54,10 +56,12 @@ function start(contenedor) {
     scene.background = new Color(colors.blue);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
-    //camera
+    //camera & controls
     const camera = new PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+    let controls = new OrbitControls (camera, renderer.domElement);
     camera.position.set(0, 2, 7); //(x,y,z), NO SON PIXELES, son unidades
     scene.add( camera );
+    controls.update();
 
     //iluminacion
     const ilumination = createIlumination(scene, colors);
@@ -85,7 +89,7 @@ function start(contenedor) {
         pcModelada.receiveShadow = true;
         
         //posicion y rotacion
-        pcModelada.position.set(0, 0, 0);
+        pcModelada.position.set(0, -2, 0);
         pcModelada.rotation.set(0, 0, 0);
 
         // Añaadir modelos a la escena
@@ -99,9 +103,22 @@ function start(contenedor) {
         // Seleccionar la animacion
         const onPc = mixer.clipAction(animationPc[0]);
         let actions = [onPc];
-        activateAnimation(onPc);
+       
+       //activateAnimation(onPc, true);
         
-        animate()
+        contenedor.addEventListener('dblclick', (event) => {
+            
+            if (animatedOn ) {
+                activateAnimation(onPc, false);
+                animatedOn = false;
+            } else {
+                activateAnimation(onPc, true);
+                animatedOn = true;
+            }
+            
+        });
+        
+        animate();
     });
 
     
@@ -114,16 +131,26 @@ function start(contenedor) {
 
         mixer.update(delta); // Esto es necesario para lograr que la animacion se reproduzca
 
+        controls.update();
+
         render();
     
     }
 
     /// Animations ///
-    function activateAnimation(action) {
+    function activateAnimation(action, start) {
         console.log("Nombre de la animacion:", action._clip.name);
         //if (action.paused === true) action.paused = false; // Si esta en pausa, lo reanuda
         //if (action._clip.name === "animation_0") action.setLoop(LoopOnce); // Lo reproduce una sola vez
-        //action.play();
+  
+        if (start) {
+            action.clampWhenFinished = true;
+            action.loop = LoopOnce;
+            action.play();
+        } else {
+            action.stop()
+        }
+        
     }
 
     function render() {
