@@ -15,7 +15,7 @@ const colors = {
     green: 0x77dd77,
 };
 
-const URLMODELO = 'assets/models/laptop_v2.gltf';
+const URLMODELO = 'assets/models/animacion2.glb';
 let modelo1;
 let light1, light2, light3, light4;
 let mixer;
@@ -53,7 +53,7 @@ function start(contenedor) {
     //scene
     const pmremGenerator = new PMREMGenerator(renderer);
     const scene = new Scene();
-    scene.background = new Color(colors.blue);
+    scene.background = new Color(colors.white);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     //camera & controls
