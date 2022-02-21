@@ -4,6 +4,11 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight, Clock, AnimationMixer, LoopOnce } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { TextureLoader } from 'three';
+import texturaLaptop from '../texturas/laptop/Roughness.png';
+import texturaInterior from '../texturas/interior_partes/interior_Roughness.png';
+import texturaProcesador from '../texturas/procesador/procesador_Roughness.png';
+
 
 //variables globales
 const colors = {
@@ -15,7 +20,7 @@ const colors = {
     green: 0x77dd77,
 };
 
-const URLMODELO = 'assets/models/animacion2.glb';
+const URLMODELO = 'assets/models/laptop2.gltf';
 let modelo1;
 let light1, light2, light3, light4;
 let mixer;
@@ -53,7 +58,7 @@ function start(contenedor) {
     //scene
     const pmremGenerator = new PMREMGenerator(renderer);
     const scene = new Scene();
-    scene.background = new Color(colors.white);
+    scene.background = new Color(colors.dark);
     scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
 
     //camera & controls
@@ -66,6 +71,14 @@ function start(contenedor) {
     //iluminacion
     const ilumination = createIlumination(scene, colors);
 
+    const textureLoader = new TextureLoader()
+    const texture = textureLoader.load(texturaLaptop);
+    texture.flipY = false;
+    const texture2 = textureLoader.load(texturaProcesador);
+    texture2.flipY = false;
+    const texture3 = textureLoader.load(texturaInterior);
+    texture3.flipY = false;
+
     //modelo
     const p1 = loadModel(URLMODELO).then((result) => {
 		modelo1 = result;
@@ -75,6 +88,7 @@ function start(contenedor) {
 	Promise.all([p1]).then(() => {
         
         let pcModelada = modelo1.scene;
+        console.log(pcModelada)
         
         // Escala
         let scale = 0.1;
@@ -84,6 +98,20 @@ function start(contenedor) {
 		pcModelada.traverse((object) => {
 			if (object.isMesh) object.castShadow = true;
 		});
+
+        //Texturas
+        pcModelada.traverse((object) => {
+            console.log(object)
+            if(object.name === 'Object007' || object.name === 'Object006' ) {
+                object.material.map = texture;
+            }
+            if(object.name === "procesador_intel001") {
+                object.material.map = texture2;
+            }
+            if(object.name === "mother") {
+                object.material.map = texture3
+            }
+        })
 
         //luces
         pcModelada.receiveShadow = true;
@@ -159,9 +187,6 @@ function start(contenedor) {
  
 
 }
-
-
-
 
 //helpers
 function loadModel(url) {
