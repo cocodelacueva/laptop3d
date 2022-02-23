@@ -5,9 +5,9 @@ import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { TextureLoader } from 'three';
-import texturaLaptop from '../texturas/laptop/Roughness.png';
-import texturaInterior from '../texturas/interior_partes/interior_Roughness.png';
-import texturaProcesador from '../texturas/procesador/procesador_Roughness.png';
+import texturaLaptop from '../texturas/laptop/BaseColor.png';
+import texturaInterior from '../texturas/interior_partes/interior_BaseColor.png';
+import texturaProcesador from '../texturas/procesador/procesador_BaseColor.png';
 
 
 //variables globales
@@ -69,8 +69,9 @@ function start(contenedor) {
     controls.update();
 
     //iluminacion
-    const ilumination = createIlumination(scene, colors);
+    const ilumination = createIlumination(scene, colors );
 
+    //Texturas
     const textureLoader = new TextureLoader()
     const texture = textureLoader.load(texturaLaptop);
     texture.flipY = false;
@@ -101,14 +102,15 @@ function start(contenedor) {
 
         //Texturas
         pcModelada.traverse((object) => {
-            console.log(object)
-            if(object.name === 'Object007' || object.name === 'Object006' ) {
+            
+            //Se agregan las texturas a los distintos objetos del modelo
+            if(texture && object.name === 'Object007' || object.name === 'Object006' ) {
                 object.material.map = texture;
             }
-            if(object.name === "procesador_intel001") {
+            if(texture2 && object.name === "procesador_intel001") {
                 object.material.map = texture2;
             }
-            if(object.name === "mother") {
+            if(texture3 && object.name === "mother") {
                 object.material.map = texture3
             }
         })
