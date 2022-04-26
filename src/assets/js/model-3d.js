@@ -1,10 +1,10 @@
 import { WEBGL } from './webgl';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight, Clock, AnimationMixer, LoopOnce } from 'three';
+import { LoadingManager, PMREMGenerator, Scene, PerspectiveCamera, WebGLRenderer, Color, BoxGeometry, MeshBasicMaterial, Mesh, AmbientLight, DirectionalLight, SphereGeometry, PointLight, Clock, AnimationMixer, LoopOnce, AnimationUtils } from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { TextureLoader } from 'three';
+import { TextureLoader, Animation } from 'three';
 import texturaLaptop from '../texturas/laptop/BaseColor.png';
 import texturaInterior from '../texturas/interior_partes/interior_BaseColor.png';
 import texturaProcesador from '../texturas/procesador/procesador_BaseColor.png';
@@ -20,7 +20,7 @@ const colors = {
     green: 0x77dd77,
 };
 
-const URLMODELO = 'assets/models/laptop2.gltf';
+const URLMODELO = 'assets/models/laptop1.gltf';
 let modelo1;
 let light1, light2, light3, light4;
 let mixer;
@@ -89,7 +89,6 @@ function start(contenedor) {
 	Promise.all([p1]).then(() => {
         
         let pcModelada = modelo1.scene;
-        console.log(pcModelada)
         
         // Escala
         let scale = 0.1;
@@ -132,9 +131,37 @@ function start(contenedor) {
 
         // Seleccionar la animacion
         const onPc = mixer.clipAction(animationPc[0]);
-        let actions = [onPc];
+        const openAnimation = AnimationUtils.subclip(animationPc[0], 'open', 1, 50);
+        const openAction = mixer.clipAction(openAnimation);
+        const closeAnimation = AnimationUtils.subclip(animationPc[0], 'close', 51, 500);
+        const closeAction = mixer.clipAction(closeAnimation);
+        // let actions = [onPc];
+
+        // console.log(onPc)
        
        //activateAnimation(onPc, true);
+        const buttons = document.querySelectorAll('.btn')
+
+        buttons[0].addEventListener('click', () => {
+
+            if(animatedOn === false) {
+                activateAnimation(openAction, true);
+                animatedOn = false;
+            } else {
+                activateAnimation(openAction, false);
+                animatedOn = true;
+            }
+        })
+
+        buttons[1].addEventListener('click', () => {
+            if(animatedOn === false) {
+                activateAnimation(closeAction, true);
+                animatedOn = false;
+            } else {
+                activateAnimation(closeAction, false);
+                animatedOn = true;
+            }
+        })
         
         contenedor.addEventListener('dblclick', (event) => {
             
@@ -169,7 +196,6 @@ function start(contenedor) {
 
     /// Animations ///
     function activateAnimation(action, start) {
-        console.log("Nombre de la animacion:", action._clip.name);
         //if (action.paused === true) action.paused = false; // Si esta en pausa, lo reanuda
         //if (action._clip.name === "animation_0") action.setLoop(LoopOnce); // Lo reproduce una sola vez
   
